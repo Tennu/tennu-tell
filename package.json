@@ -1,0 +1,22 @@
+{
+  "name": "tennu-tell",
+  "version": "1.0.0",
+  "description": "A plugin for the tennu IRC framework, memoserv replacement that hooks into dbcore.",
+  "main": "plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tennu/tennu-tennu"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postversion": "git push && git push --tags && npm publish"
+  },
+  "author": "Victorio Berra",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.0.5",
+    "error": "^7.0.2",
+    "lodash": "^3.10.1",
+    "moment": "^2.10.6"
+  }
+}
