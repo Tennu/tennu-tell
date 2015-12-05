@@ -28,7 +28,7 @@ function getResponses(tells, nickname) {
                 responses.nonquery = {
                     query: false,
                     message: [
-                        format('%s, you have %s tell:', nickname, publicTells.length, (publicTells.length > 1 ? 's' : ''))
+                        format('%s, you have %s tell%s:', nickname, publicTells.length, (publicTells.length > 1 ? 's' : ''))
                     ]
                 }
             }
