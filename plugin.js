@@ -25,7 +25,7 @@ var TennuTell = {
         };
 
         var tellConfig = client.config("tell");
-        if (!tellConfig || !tellConfig.maxAtOnce) {
+        if (!tellConfig || !tellConfig.hasOwnProperty('maxAtOnce')) {
             throw Error('tennu-tell: is missing some or all of its configuration.');
         }
 
