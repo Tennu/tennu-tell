@@ -20,9 +20,9 @@ Compatible with [tennu-cooldown](https://github.com/LordWingZero/tennu-cooldown)
 ### Configuration
 - **maxAtOnce** : Prevents people from saving > n tells at once.
 ```` Javascript
-"agoogle":{
+"tell":{
   "limitResults": 1,
-  "maxUserDefinedLimit": 3
+  "floodDelay": 1500
 }
 ````
 
