@@ -53,7 +53,7 @@ var TennuTell = {
             handlers: {
                 "privmsg": function(IRCMessage) {
                     dbTellPromise.then(function(tell) {
-                        tell.emit(IRCMessage.nickname).then(function(responses) {
+                        tell.emit(IRCMessage.nickname, client._logger.error).then(function(responses) {
 
                             if (responses.nonquery) {
                                 setTimeout(function() {
