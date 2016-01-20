@@ -14,10 +14,7 @@ var TennuTell = {
     init: function(client, imports) {
 
         const dbTellPromise = imports.dbcore.then(function(knex) {
-            // tell.js will return a promise as it fetches all unread tells
-            return require('./lib/tell')(knex, client).then(function(tell) {
-                return tell;
-            });
+            return require('./lib/tell')(knex, client);
         });
 
         const helps = {
