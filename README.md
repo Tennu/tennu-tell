@@ -26,11 +26,6 @@ Compatible with [tennu-cooldown](https://github.com/LordWingZero/tennu-cooldown)
 }
 ````
 
-### Requires
-- [tennu-dblogger](https://github.com/LordWingZero/tennu-dblogger)
-  - [tennu-dbcore](https://github.com/LordWingZero/tennu-dbcore)
-
-
 ### Installing Into Tennu
 
 See Downloadable Plugins [here](https://tennu.github.io/plugins/).
