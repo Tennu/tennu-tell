@@ -23,6 +23,9 @@ var TennuTell = {
                 "{{!}}tell <nick1[,<nick2>,<nick3>]> <message>",
                 "Example:",
                 '{{!}}tell JaneDoe,FarmerGuy Hello World'
+            ],
+            "tellrefresh": [
+                "Re-pull down all tells from the DB into cache"
             ]
         };
 
@@ -111,18 +114,31 @@ var TennuTell = {
                                 });
                             });
                         });
-                    }).catch(function(err){
+                    }).catch(function(err) {
                         return {
                             intent: 'notice',
                             query: true,
                             message: err
                         };
                     });
+                },
+                '!tellrefresh': function() {
+                    return dbTellPromise.then(function(tell) {
+                        return tell.refresh().then(function(tells) {
+                            tell.unreadTells = tells;
+                            return {
+                                intent: 'notice',
+                                query: true,
+                                message: format('Tell cache reloaded with %s unread tells.', tells.length)
+                            };
+                        });
+                    })
                 }
             },
 
             help: {
-                "!tell": helps.tell
+                "!tell": helps.tell,
+                "!tellrefresh": helps.tellrefresh
             },
 
             commands: ["tell"]
