@@ -31,7 +31,8 @@ var TennuTell = {
                 "Re-pull down all tells from the DB into cache, delayed tells are cleared and restored into pending.",
                 "Alias: !reloadtells"
             ],
-            "delaytells <duration>": [
+            "delaytells": [
+                "!delaytells <duration>",
                 "This will hold your tells for a duration",
                 "durations: 1d 5h 10s ect."
             ],

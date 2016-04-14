@@ -7,10 +7,28 @@ MemoServ replacement with extra features. Purpose built specifically for my main
 Compatible with [tennu-cooldown](https://github.com/LordWingZero/tennu-cooldown). Lets regular users run it every X seconds.
 
 ### Usage
-````!tell <nick[,nick2]> <message>````
-
+```
+"tell": [
+    "Save a tell for a user(s).",
+    "{{!}}tell <nick1[,<nick2>,<nick3>]> <message>",
+    "Example:",
+    '{{!}}tell JaneDoe,FarmerGuy Hello World'
+],
+"tellrefresh": [
+    "Re-pull down all tells from the DB into cache, delayed tells are cleared and restored into pending.",
+    "Alias: !reloadtells"
+],
+"delaytells <duration>": [
+    "This will hold your tells for a duration",
+    "durations: 1d 5h 10s ect."
+],
+"forcetells": [
+    "Forces out any delayed tells"
+]
+```
 
 ### Features
+- Delay a tell from emitting with the duration of your choice
 - Distinguishes between private and public tells depending on if you sent the tell directly to the bot.
 - Plays tells back privately or publicly depending on if you pm the bot after recieving tells.
 - Hooks into dbcore (We have a web interface where tells can be edited, so database storage is very useful)
