@@ -1,6 +1,9 @@
 var array = require('lodash/array');
 var Promise = require('bluebird');
 var format = require('util').format;
+var moment = require("moment");
+var parseDuration = require('parse-duration');
+var errors = require('./lib/errors');
 var _ = require('lodash');
 
 var TennuTell = {
@@ -25,7 +28,15 @@ var TennuTell = {
                 '{{!}}tell JaneDoe,FarmerGuy Hello World'
             ],
             "tellrefresh": [
-                "Re-pull down all tells from the DB into cache"
+                "Re-pull down all tells from the DB into cache, delayed tells are cleared and restored into pending.",
+                "Alias: !reloadtells"
+            ],
+            "delaytells <duration>": [
+                "This will hold your tells for a duration",
+                "durations: 1d 5h 10s ect."
+            ],
+            "forcetells": [
+                "Forces out any delayed tells"
             ]
         };
 
@@ -49,23 +60,30 @@ var TennuTell = {
             }
         }
 
+        function processResponses(IRCMessage, responses) {
+            if (responses.nonquery) {
+                setTimeout(function() {
+                    recurse(IRCMessage, responses.nonquery.message, 'nonquery')
+                }, tellConfig.floodDelay);
+            }
+            if (responses.query) {
+                setTimeout(function() {
+                    recurse(IRCMessage, responses.query.message, 'query')
+                }, tellConfig.floodDelay);
+            }
+        };
+
         return {
             handlers: {
                 "privmsg": function(IRCMessage) {
+
+                    if (/^!delaytells?/.test(IRCMessage.message)) {
+                        return;
+                    }
+
                     dbTellPromise.then(function(tell) {
-                        tell.emit(IRCMessage.nickname, client._logger.error).then(function(responses) {
-
-                            if (responses.nonquery) {
-                                setTimeout(function() {
-                                    recurse(IRCMessage, responses.nonquery.message, 'nonquery')
-                                }, tellConfig.floodDelay);
-                            }
-                            if (responses.query) {
-                                setTimeout(function() {
-                                    recurse(IRCMessage, responses.query.message, 'query')
-                                }, tellConfig.floodDelay);
-                            }
-
+                        tell.emit(IRCMessage.nickname).then(function(responses) {
+                            processResponses(IRCMessage, responses);
                         }).catch(function(err) {
                             if (err.type !== 'tell.notells') {
                                 client._logger.error(err);
@@ -122,10 +140,11 @@ var TennuTell = {
                         };
                     });
                 },
-                '!tellrefresh': function() {
+                '!tellrefresh !reloadtells': function() {
                     return dbTellPromise.then(function(tell) {
                         return tell.refresh().then(function(tells) {
                             tell.unreadTells = tells;
+                            tell.pendingTells = [];
                             return {
                                 intent: 'notice',
                                 query: true,
@@ -133,15 +152,59 @@ var TennuTell = {
                             };
                         });
                     })
+                },
+                '!delaytells': function(IRCMessage) {
+
+                    // Process the duration
+                    var durationMS = parseDuration(IRCMessage.message);
+
+                    if (!durationMS) {
+                        durationMS = 1800000
+                    }
+
+                    var duration = moment.duration(Math.abs(durationMS), 'ms');
+                    var expiresOn = moment().add(duration).toDate();
+                    var humanized = duration.humanize();
+
+                    return dbTellPromise.then(function(tell) {
+                        return tell.delay(IRCMessage.nickname, expiresOn).then(function(tells) {
+                                return {
+                                    intent: 'notice',
+                                    query: true,
+                                    message: format("Delayed %s tells for %s.", tells.length, humanized)
+                                };
+                            })
+                            .catch(errors.TellNoTellsError, function(err) {
+                                return {
+                                    intent: 'notice',
+                                    query: true,
+                                    message: err
+                                };
+                            });
+                    })
+                },
+                '!forcetells': function(IRCMessage) {
+                    return dbTellPromise.then(function(tell) {
+                        return tell.force(IRCMessage.nickname)
+                            .catch(errors.TellNoTellsError, function(err) {
+                                return {
+                                    intent: 'notice',
+                                    query: true,
+                                    message: err
+                                };
+                            });
+                    })
                 }
             },
 
             help: {
                 "!tell": helps.tell,
-                "!tellrefresh": helps.tellrefresh
+                "!tellrefresh": helps.tellrefresh,
+                "!delaytells": helps.delaytells,
+                "!forcetells": helps.forcetells
             },
 
-            commands: ["tell"]
+            commands: ["tell", "!tellrefresh", "!delaytells", "forcetells"]
         }
     }
 };
