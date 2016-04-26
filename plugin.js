@@ -20,26 +20,7 @@ var TennuTell = {
             return require('./lib/tell')(knex, client);
         });
 
-        const helps = {
-            "tell": [
-                "Save a tell for a user(s).",
-                "{{!}}tell <nick1[,<nick2>,<nick3>]> <message>",
-                "Example:",
-                '{{!}}tell JaneDoe,FarmerGuy Hello World'
-            ],
-            "tellrefresh": [
-                "Re-pull down all tells from the DB into cache, delayed tells are cleared and restored into pending.",
-                "Alias: !reloadtells"
-            ],
-            "delaytells": [
-                "!delaytells <duration>",
-                "This will hold your tells for a duration",
-                "durations: 1d 5h 10s ect."
-            ],
-            "forcetells": [
-                "Forces out any delayed tells"
-            ]
-        };
+        const helps = require("./helps.json")
 
         var tellConfig = client.config("tell");
 
@@ -78,9 +59,15 @@ var TennuTell = {
             handlers: {
                 "privmsg": function(IRCMessage) {
 
+                    // !delaytells command should abort tell emitter
                     if (/^!delaytells?/.test(IRCMessage.message)) {
                         return;
                     }
+                    
+                    // !skiptells command should abort tell emitter
+                    if (/^!skiptells?/.test(IRCMessage.message)) {
+                        return;
+                    }                    
 
                     dbTellPromise.then(function(tell) {
                         tell.emit(IRCMessage.nickname).then(function(responses) {
@@ -195,14 +182,34 @@ var TennuTell = {
                                 };
                             });
                     })
+                },
+                '!skiptells': function(IRCMessage) {
+                    return dbTellPromise.then(function(tell) {
+                        return tell.skip(IRCMessage.nickname)
+                            .then(function(removedTells){
+                                return {
+                                    intent: 'notice',
+                                    query: true,
+                                    message: format("Marked %s pending tells for you as read.", removedTells.length)
+                                };
+                            })
+                            .catch(errors.TellNoTellsError, function(err) {
+                                return {
+                                    intent: 'notice',
+                                    query: true,
+                                    message: err
+                                };
+                            });
+                    })
                 }
             },
 
             help: {
-                "!tell": helps.tell,
-                "!tellrefresh": helps.tellrefresh,
-                "!delaytells": helps.delaytells,
-                "!forcetells": helps.forcetells
+                "tell": helps.tell,
+                "tellrefresh": helps.tellrefresh,
+                "delaytells": helps.delaytells,
+                "forcetells": helps.forcetells,
+                "skiptells": helps.skiptells
             },
 
             commands: ["tell", "!tellrefresh", "!delaytells", "forcetells"]

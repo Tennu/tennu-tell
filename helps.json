@@ -1,0 +1,23 @@
+{
+	"tell": [
+		"Save a tell for a user(s).",
+		"{{!}}tell <nick1[,<nick2>,<nick3>]> <message>",
+		"Example:",
+		"{{!}}tell JaneDoe,FarmerGuy Hello World"
+	],
+	"tellrefresh": [
+		"Re-pull down all tells from the DB into cache, delayed tells are cleared and restored into pending.",
+		"Alias: !reloadtells"
+	],
+	"delaytells": [
+		"!delaytells <duration>",
+		"This will hold your tells for a duration",
+		"durations: 1d 5h 10s ect."
+	],
+	"forcetells": [
+		"Forces out any delayed tells"
+	],
+	"skiptells": [
+		"All current tells in buffer for the user are flushed and NOT emitted"
+	]
+}
