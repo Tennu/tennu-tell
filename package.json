@@ -1,6 +1,6 @@
 {
   "name": "tennu-tell",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "A plugin for the tennu IRC framework, memoserv replacement that hooks into dbcore.",
   "main": "plugin.js",
   "repository": {
@@ -19,5 +19,8 @@
     "lodash": "^3.10.1",
     "moment": "^2.12.0",
     "parse-duration": "^0.1.1"
+  },
+  "peerDependencies": {
+    "tennu-dbcore": "^2"
   }
 }

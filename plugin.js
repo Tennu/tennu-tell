@@ -1,13 +1,14 @@
 var array = require('lodash/array');
 var Promise = require('bluebird');
 var format = require('util').format;
+var path = require("path");
 var moment = require("moment");
 var parseDuration = require('parse-duration');
 var errors = require('./lib/errors');
 var _ = require('lodash');
 
 var TennuTell = {
-    requiresRoles: ['dbcore', 'dblogger'],
+    requiresRoles: ['dbcore'],
     configDefaults: {
         "tell": {
             "maxAtOnce": 10,
@@ -16,7 +17,12 @@ var TennuTell = {
     },
     init: function(client, imports) {
 
-        const dbTellPromise = imports.dbcore.then(function(knex) {
+        const knex = imports.dbcore.knex;
+        
+        var dbTellPromise = knex.migrate.latest({
+                tableName: 'tennu_tell_knex_migrations',
+                directory: path.join(__dirname, 'migrations')
+            }).then(function() {
             return require('./lib/tell')(knex, client);
         });
 
