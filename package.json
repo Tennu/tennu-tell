@@ -21,6 +21,6 @@
     "parse-duration": "^0.1.1"
   },
   "peerDependencies": {
-    "tennu-dbcore": "^2"
+    "tennu-dbcore": "^3"
   }
 }
